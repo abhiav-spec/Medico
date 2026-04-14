@@ -1,113 +1,122 @@
 'use client';
 
+import { useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
-import { motion } from "framer-motion";
-import { ArrowRight, Brain, Heart, Wind, GraduationCap, ChevronRight } from "lucide-react";
+import { ArrowRight, Brain, Heart, Wind, GraduationCap, ChevronRight, Zap, Shield, Microscope } from "lucide-react";
 import Link from "next/link";
+import { gsap } from "gsap";
+import { Canvas } from "@react-three/fiber";
+import NeuralHero from "@/components/visuals/NeuralHero";
 
 export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".hero-content > *", {
+        y: 40,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power4.out"
+      });
+
+      gsap.from(".bento-item", {
+        y: 60,
+        opacity: 0,
+        duration: 1.2,
+        stagger: 0.2,
+        delay: 0.5,
+        ease: "power3.out"
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <main className="min-h-screen bg-slate-50">
+    <div ref={containerRef} className="relative min-h-screen bg-[#f8f9ff] selection:bg-primary selection:text-white">
       <Navbar />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100/30 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-100/30 blur-[120px] rounded-full" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-wider mb-6 border border-blue-100">
-              <Activity className="w-3 h-3" /> AI-Powered Simulation
-            </span>
-            <h1 className="text-5xl md:text-7xl font-bold heading-font tracking-tight text-slate-900 mb-6">
-              Master Medicine <br />
-              <span className="text-blue-600 underline decoration-blue-200 underline-offset-8">Intelligently.</span>
+        <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center">
+          <div className="lg:w-1/2 text-left z-10 hero-content">
+            <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full glass-indigo text-xs font-semibold text-primary mb-8 clinical-shadow">
+              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+              <span className="tracking-[0.2em] uppercase">The Neural Observatory</span>
+            </div>
+            
+            <h1 className="text-6xl lg:text-[7rem] font-black mb-8 leading-[0.9] tracking-tighter text-on-surface">
+              Precision <br />
+              <span className="text-primary italic">Clinical</span> Intelligence.
             </h1>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Experience the next generation of medical learning. 
-              AI-generated simulations personalized to your level, 
-              interactive organ study, and voice-guided explanations.
+            
+            <p className="text-xl text-on-surface-variant mb-10 max-w-lg leading-relaxed font-medium">
+              Step into a high-fidelity simulation environment where AI insights and interactive 3D anatomy converge for the next generation of medical specialists.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link 
-                href="/register" 
-                className="w-full sm:w-auto px-8 py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 flex items-center justify-center gap-2 group"
-              >
-                Start Learning Now
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
+              <Link href="/register" className="neural-pulse px-10 py-5 rounded-2xl font-bold text-white flex items-center justify-center group transition-transform hover:scale-105">
+                Begin Simulation <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link 
-                href="/about" 
-                className="w-full sm:w-auto px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
-              >
-                See How It Works
+              <Link href="/login" className="px-10 py-5 rounded-2xl font-bold text-primary glass-indigo hover:bg-[#3525cd]/5 transition-all flex items-center justify-center">
+                Access Telemetry
               </Link>
             </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Feature Grid */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold heading-font text-slate-900 mb-4">Focus on Every Detail</h2>
-            <p className="text-slate-500">Select an organ to start your customized simulation session</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <FeatureCard 
-              icon={<Heart className="w-6 h-6 text-pink-500" />}
-              title="Cardiovascular"
-              description="Master cardiology with simulations on heart anatomy, physiology, and pathology."
-              color="pink"
-            />
-            <FeatureCard 
-              icon={<Brain className="w-6 h-6 text-purple-500" />}
-              title="Neurology"
-              description="Deep dive into the nervous system, brain functions, and neurological conditions."
-              color="purple"
-            />
-            <FeatureCard 
-              icon={<Wind className="w-6 h-6 text-blue-500" />}
-              title="Pulmonology"
-              description="Study the respiratory system, complex lung diseases, and ventilation mechanics."
-              color="blue"
-            />
+          <div className="lg:w-1/2 h-[700px] w-full relative">
+            <Canvas camera={{ position: [0, 0, 4] }}>
+              <NeuralHero />
+            </Canvas>
           </div>
         </div>
       </section>
-    </main>
-  );
-}
 
-function FeatureCard({ icon, title, description, color }: { icon: React.ReactNode, title: string, description: string, color: string }) {
-  const colorMap: any = {
-    pink: "bg-pink-50 border-pink-100 group-hover:bg-pink-100",
-    purple: "bg-purple-50 border-purple-100 group-hover:bg-purple-100",
-    blue: "bg-blue-50 border-blue-100 group-hover:bg-blue-100"
-  };
-
-  return (
-    <div className="group p-8 rounded-2xl border border-slate-100 hover:border-blue-100 hover:shadow-xl hover:shadow-slate-100 transition-all duration-300">
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-colors ${colorMap[color]}`}>
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold heading-font text-slate-900 mb-3">{title}</h3>
-      <p className="text-slate-500 leading-relaxed mb-6">{description}</p>
-      <Link href="/login" className="flex items-center gap-2 text-sm font-bold text-blue-600">
-        Start Module <ChevronRight className="w-4 h-4" />
-      </Link>
+      {/* Bento Grid Features */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <BentoItem 
+            icon={<span className="material-symbols-outlined text-4xl text-primary">psychology</span>}
+            title="Neural Insights"
+            description="AI-driven feedback loops that adapt to your unique diagnostic trajectory in real-time."
+            className="md:col-span-2 bg-[#ffffff] clinical-shadow"
+          />
+          <BentoItem 
+             icon={<span className="material-symbols-outlined text-4xl text-primary">cardiology</span>}
+            title="Live Telemetry"
+            description="Simulated vital signs across pulmonary and cardiac systems."
+            className="bg-[#eff4ff]"
+          />
+          <BentoItem 
+             icon={<span className="material-symbols-outlined text-4xl text-primary">microscope</span>}
+            title="Precision Training"
+            description="High-fidelity case studies."
+            className="bg-[#eff4ff]"
+          />
+          <BentoItem 
+             icon={<span className="material-symbols-outlined text-4xl text-primary">shield_health</span>}
+            title="Clinical Safety"
+            description="Risk-free environment for complex procedural training."
+            className="md:col-span-2 bg-[#ffffff] clinical-shadow"
+          />
+        </div>
+      </section>
     </div>
   );
 }
 
-import { Activity } from "lucide-react";
+function BentoItem({ icon, title, description, className }: { icon: React.ReactNode, title: string, description: string, className?: string }) {
+  return (
+    <div className={`bento-item p-10 rounded-[2.5rem] group border border-transparent hover:border-primary/10 transition-all duration-500 ${className}`}>
+      <div className="mb-8 p-4 rounded-2xl bg-[#f8f9ff] inline-block group-hover:scale-110 transition-transform duration-500">
+        {icon}
+      </div>
+      <h3 className="text-3xl font-black mb-4 tracking-tight group-hover:text-primary transition-colors">{title}</h3>
+      <p className="text-on-surface-variant leading-relaxed font-semibold text-lg opacity-70">
+        {description}
+      </p>
+    </div>
+  );
+}

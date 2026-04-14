@@ -3,70 +3,75 @@
 @tailwind utilities;
 
 :root {
-  --background: #0c0c1d;
-  --foreground: #e3e0f9;
-  --primary: #c0c1ff;
-  --secondary: #5de6ff;
-  --accent: #6366F1;
-  --surface-low: #121223;
-  --surface-high: #1e1e30;
-  --surface-highest: #333346;
+  --primary: #3525cd;
+  --primary-container: #4f46e5;
+  --background: #f8f9ff;
+  --surface-low: #eff4ff;
+  --surface-lowest: #ffffff;
+  --surface-container-high: #dce9ff;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #464555;
+  --outline: rgba(119, 117, 135, 0.15);
+  --error: #ba1a1a;
+  
+  --font-inter: 'Inter', sans-serif;
 }
 
 body {
-  color: var(--foreground);
+  color: var(--on-surface);
   background: var(--background);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-inter);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-.heading-font {
-  font-family: var(--font-outfit), sans-serif;
-  letter-spacing: -0.02em;
-}
+/* Clinical Curator Utilities */
 
-/* Glassmorphism */
 .glass {
-  background: rgba(30, 30, 48, 0.4);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.glass-bright {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--outline);
 }
 
-/* Animated Gradients */
+.glass-indigo {
+  background: rgba(53, 37, 205, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(53, 37, 205, 0.1);
+}
+
+.clinical-shadow {
+  box-shadow: 0 20px 40px -12px rgba(11, 28, 48, 0.08);
+}
+
 .neural-pulse {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  box-shadow: 0 0 20px rgba(93, 230, 255, 0.3);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+  box-shadow: 0 8px 16px -4px rgba(53, 37, 205, 0.25);
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+  background: linear-gradient(135deg, var(--on-surface) 0%, var(--primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Animations */
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+/* Layout Heurtistics */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Tonal Layering */
 .surface-tier-1 { background-color: var(--surface-low); }
-.surface-tier-2 { background-color: var(--surface-high); }
-.surface-tier-3 { background-color: var(--surface-highest); }
+.surface-tier-2 { background-color: var(--surface-container-high); }
+.surface-tier-3 { background-color: var(--surface-lowest); }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }

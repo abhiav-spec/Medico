@@ -7,7 +7,7 @@ import AuthLayout from '@/components/AuthLayout';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Fingerprint, Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -23,10 +23,10 @@ export default function LoginPage() {
         try {
             const res = await api.post('/auth/login', { email, password });
             setAuth(res.data.user, res.data.token);
-            toast.success('Welcome back!');
+            toast.success('Access Granted');
             router.push('/dashboard');
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Login failed');
+            toast.error(err.response?.data?.message || 'Authentication Failed');
         } finally {
             setIsLoading(false);
         }
@@ -34,46 +34,62 @@ export default function LoginPage() {
 
     return (
         <AuthLayout 
-            title="Welcome back" 
-            subtitle="Please enter your details to sign in"
+            title="System Access" 
+            subtitle="Secure biometric link required for neural simulation."
         >
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                    <input 
-                        type="email" 
-                        required 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                        placeholder="doctor@hospital.com"
-                    />
+                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-3 ml-1">ID Credentials</label>
+                    <div className="relative group">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
+                        <input 
+                            type="email" 
+                            required 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/5 focus:bg-white/10 focus:border-primary/50 transition-all outline-none text-white placeholder:text-slate-600"
+                            placeholder="user@neural.obs"
+                        />
+                    </div>
                 </div>
                 <div>
-                    <div className="flex justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-700">Password</label>
-                        <Link href="/forgot" className="text-sm font-bold text-blue-600 hover:text-blue-700">Forgot?</Link>
+                    <div className="flex justify-between mb-3 ml-1">
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Security Phrase</label>
+                        <Link href="/forgot" className="text-[10px] uppercase tracking-widest font-bold text-primary hover:text-white transition-colors">Forgot?</Link>
                     </div>
-                    <input 
-                        type="password" 
-                        required 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                        placeholder="••••••••"
-                    />
+                    <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-secondary transition-colors" />
+                        <input 
+                            type="password" 
+                            required 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/5 focus:bg-white/10 focus:border-secondary/50 transition-all outline-none text-white placeholder:text-slate-600"
+                            placeholder="••••••••"
+                        />
+                    </div>
                 </div>
 
-                <button 
-                    type="submit" 
-                    disabled={isLoading}
-                    className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
-                >
-                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Log In'}
-                </button>
+                <div className="pt-4">
+                    <button 
+                        type="submit" 
+                        disabled={isLoading}
+                        className="neural-pulse w-full py-4 text-background rounded-2xl font-bold flex items-center justify-center gap-2 group overflow-hidden relative"
+                    >
+                        {isLoading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                            <>
+                                <Fingerprint className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                <span>Validate Access</span>
+                            </>
+                        )}
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                    </button>
+                </div>
 
-                <p className="text-center text-slate-500 mt-8">
-                    Don't have an account? <Link href="/register" className="font-bold text-blue-600 hover:text-blue-700">Sign Up</Link>
+                <p className="text-center text-[10px] uppercase tracking-widest font-bold text-slate-500 mt-10">
+                    New simulation participant? <Link href="/register" className="text-primary hover:text-white transition-colors">Apply here</Link>
                 </p>
             </form>
         </AuthLayout>

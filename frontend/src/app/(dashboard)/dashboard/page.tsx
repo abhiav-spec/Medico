@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { 
     Activity, 
     Target, 
@@ -7,22 +8,26 @@ import {
     Clock, 
     ArrowUpRight, 
     PlayCircle,
-    Plus
+    Plus,
+    Sparkles,
+    Shield,
+    TrendingUp,
+    Stethoscope,
+    Dna,
+    Brain
 } from 'lucide-react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { 
-    LineChart, 
-    Line, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    ResponsiveContainer,
     AreaChart,
-    Area
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer
 } from 'recharts';
+import { gsap } from 'gsap';
 
 const data = [
     { name: 'Mon', accuracy: 65 },
@@ -36,96 +41,120 @@ const data = [
 
 export default function DashboardPage() {
     const user = useAuthStore((state) => state.user);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            gsap.from(".dash-element", {
+                opacity: 0,
+                y: 20,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "power3.out"
+            });
+        }, containerRef);
+        return () => ctx.revert();
+    }, []);
 
     return (
-        <div className="space-y-8">
-            <header className="flex justify-between items-end">
+        <div ref={containerRef} className="space-y-10 pb-20 max-w-7xl mx-auto">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 dash-element">
                 <div>
-                    <h1 className="text-3xl font-bold heading-font text-slate-900">
-                        Welcome back, {user?.name.split(' ')[0]} 👋
+                    <div className="inline-flex items-center space-x-2 px-4 py-1 rounded-full glass-indigo text-[10px] font-black text-primary mb-4 uppercase tracking-[0.2em]">
+                        <span className="flex h-1.5 w-1.5 rounded-full bg-primary" />
+                        <span>System ID: {user?.id?.slice(-8).toUpperCase()}</span>
+                    </div>
+                    <h1 className="text-5xl font-black tracking-tighter text-on-surface">
+                        Welcome, <span className="text-primary italic">{user?.name.split(' ')[0]}</span>
                     </h1>
-                    <p className="text-slate-500 mt-1">Ready to continue your medical training?</p>
+                    <p className="text-on-surface-variant mt-2 font-semibold opacity-60">Neural Telemetry active. Ready for clinical simulation.</p>
                 </div>
-                <Link 
-                    href="/quizzes" 
-                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
-                >
-                    <Plus className="w-5 h-5" />
-                    New Simulation
-                </Link>
+                <div className="flex gap-4">
+                    <Link 
+                        href="/quizzes" 
+                        className="neural-pulse flex items-center gap-3 px-8 py-4 text-white rounded-2xl font-black hover:scale-105 transition-all shadow-xl leading-none"
+                    >
+                        <Plus className="w-5 h-5" />
+                        BEGIN SIMULATION
+                    </Link>
+                </div>
             </header>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 dash-element">
                 <StatCard 
-                    icon={<Target className="w-5 h-5 text-blue-600" />} 
-                    label="Avg. Accuracy" 
-                    value="84%" 
-                    trend="+5.2%"
+                    icon={<Target className="w-6 h-6" />} 
+                    label="Clinical Accuracy" 
+                    value="84.2%" 
+                    trend="+2.1%"
+                    color="primary"
                 />
                 <StatCard 
-                    icon={<Activity className="w-5 h-5 text-emerald-600" />} 
-                    label="Quizzes Done" 
+                    icon={<Activity className="w-6 h-6" />} 
+                    label="Cases Resolved" 
                     value="24" 
-                    trend="+12"
+                    trend="+4"
+                    color="indigo"
                 />
                 <StatCard 
-                    icon={<Book className="w-5 h-5 text-purple-600" />} 
-                    label="Notes Saved" 
-                    value="156" 
-                    trend="+28"
-                />
-                <StatCard 
-                    icon={<Clock className="w-5 h-5 text-orange-600" />} 
-                    label="Study Hours" 
-                    value="12.5h" 
-                    trend="+2.1h"
+                    icon={<Dna className="w-6 h-6" />} 
+                    label="Neural Points" 
+                    value="1,420" 
+                    trend="+240"
+                    color="primary"
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Performance Graph */}
-                <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 premium-shadow">
-                    <div className="flex justify-between items-center mb-8">
+                <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-10 clinical-shadow dash-element border border-primary/5">
+                    <div className="flex justify-between items-center mb-10">
                         <div>
-                            <h3 className="text-lg font-bold heading-font text-slate-900">Performance Trend</h3>
-                            <p className="text-sm text-slate-500">Weekly accuracy percentage</p>
+                            <h3 className="text-2xl font-black tracking-tight text-on-surface uppercase">Neural Performance</h3>
+                            <p className="text-sm text-on-surface-variant font-bold opacity-50 uppercase tracking-widest mt-1">Diagnostic Telemetry / 7 Day Cycle</p>
                         </div>
-                        <select className="bg-slate-50 border-none text-sm font-bold rounded-lg px-3 py-1.5 focus:ring-0">
-                            <option>Last 7 Days</option>
-                            <option>Last 30 Days</option>
-                        </select>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-[#f8f9ff] rounded-xl text-[10px] font-black text-primary border border-primary/5 uppercase tracking-widest">
+                            <TrendingUp className="w-3 h-3" />
+                            Stable Growth
+                        </div>
                     </div>
-                    <div className="h-[300px] w-full">
+                    <div className="h-[400px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={data}>
                                 <defs>
                                     <linearGradient id="colorAccuracy" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1}/>
-                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                                        <stop offset="5%" stopColor="#3525cd" stopOpacity={0.1}/>
+                                        <stop offset="95%" stopColor="#3525cd" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(53, 37, 205, 0.05)" />
                                 <XAxis 
                                     dataKey="name" 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                                    tick={{ fill: '#464555', fontSize: 11, fontWeight: 700 }} 
                                     dy={10}
                                 />
                                 <YAxis 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                                    tick={{ fill: '#464555', fontSize: 11, fontWeight: 700 }} 
                                 />
                                 <Tooltip 
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                                    contentStyle={{ 
+                                        backgroundColor: '#ffffff', 
+                                        borderRadius: '20px', 
+                                        border: '1px solid rgba(53, 37, 205, 0.1)',
+                                        boxShadow: '0 20px 40px -12px rgba(11, 28, 48, 0.1)',
+                                        fontFamily: 'var(--font-inter)',
+                                        fontWeight: 800
+                                    }}
                                 />
                                 <Area 
                                     type="monotone" 
                                     dataKey="accuracy" 
-                                    stroke="#2563eb" 
-                                    strokeWidth={3}
+                                    stroke="#3525cd" 
+                                    strokeWidth={6}
                                     fillOpacity={1} 
                                     fill="url(#colorAccuracy)" 
                                 />
@@ -134,54 +163,75 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Recent Simulations */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 premium-shadow">
-                    <h3 className="text-lg font-bold heading-font text-slate-900 mb-6">Recent activity</h3>
-                    <div className="space-y-6">
-                        <RecentItem title="Cardiology Quiz" date="2 hours ago" score="90%" status="complete" />
-                        <RecentItem title="Neurology Case" date="Yesterday" score="85%" status="complete" />
-                        <RecentItem title="Pulmonology Exam" date="3 days ago" score="78%" status="complete" />
-                        <RecentItem title="Brain Anatomy" date="4 days ago" score="95%" status="complete" />
+                {/* Quick Action Card (Bento 스타일) */}
+                <div className="flex flex-col gap-6">
+                    <div className="bg-[#3525cd] rounded-[2.5rem] p-10 text-white clinical-shadow dash-element relative overflow-hidden group">
+                        <div className="relative z-10">
+                            <h3 className="text-3xl font-black mb-4 leading-tight tracking-tighter">Instant <br />Case Study</h3>
+                            <p className="text-white/60 font-bold text-sm mb-8 leading-relaxed">Generate a fresh clinical scenario based on your weakest areas.</p>
+                            <button className="w-full py-4 bg-white text-primary rounded-2xl font-black text-xs tracking-widest uppercase hover:scale-[1.02] transition-transform">
+                                INITIATE AI GENERATION
+                            </button>
+                        </div>
+                        <Brain className="absolute -bottom-10 -right-10 w-48 h-48 text-white/5 group-hover:scale-110 transition-transform duration-700" />
                     </div>
-                    <Link href="/history" className="block w-full text-center mt-8 text-sm font-bold text-blue-600 hover:text-blue-700">
-                        View all history
-                    </Link>
+
+                     {/* Recent Telemetry */}
+                    <div className="bg-[#eff4ff] rounded-[2.5rem] p-10 clinical-shadow dash-element flex-grow border border-primary/5">
+                        <h3 className="text-xl font-black tracking-tight text-on-surface mb-8 uppercase tracking-widest opacity-40">System Logs</h3>
+                        <div className="space-y-6">
+                            <RecentItem title="Endocrinology" date="Today, 14:20" score="94%" />
+                            <RecentItem title="Nephrology" date="Yesterday" score="82%" />
+                            <RecentItem title="Surgical Ethics" date="2 days ago" score="88%" />
+                        </div>
+                        <Link href="/history" className="flex items-center justify-center mt-10 text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">
+                            View Full Archive <ChevronRight className="w-3 h-3 ml-1" />
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-function StatCard({ icon, label, value, trend }: any) {
+function StatCard({ icon, label, value, trend, color }: any) {
     return (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 premium-shadow">
-            <div className="flex justify-between items-start mb-4">
-                <div className="p-2.5 bg-slate-50 rounded-xl">
+        <div className="bg-white p-10 rounded-[2.5rem] clinical-shadow hover:scale-[1.02] transition-all group duration-500 border border-primary/5">
+            <div className="flex justify-between items-start mb-8">
+                <div className={`p-4 rounded-2xl ${color === 'primary' ? 'bg-[#3525cd]/5 text-primary' : 'bg-[#4f46e5]/5 text-[#4f46e5]'} group-hover:scale-110 transition-transform duration-500`}>
                     {icon}
                 </div>
-                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg flex items-center gap-1">
+                <span className="text-[10px] font-black text-primary px-3 py-1.5 rounded-full glass-indigo flex items-center gap-1 uppercase tracking-widest">
                     <ArrowUpRight className="w-3 h-3" /> {trend}
                 </span>
             </div>
-            <p className="text-slate-500 text-sm font-medium">{label}</p>
-            <h4 className="text-2xl font-bold heading-font text-slate-900 mt-1">{value}</h4>
+            <p className="text-on-surface-variant text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-50">{label}</p>
+            <h4 className="text-4xl font-black tracking-tighter text-on-surface">{value}</h4>
         </div>
     );
 }
 
-function RecentItem({ title, date, score, status }: any) {
+function RecentItem({ title, date, score }: any) {
+  return (
+      <div className="flex items-center justify-between group cursor-pointer">
+          <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary clinical-shadow group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                  <Stethoscope className="w-5 h-5" />
+              </div>
+              <div>
+                  <h5 className="text-sm font-black text-on-surface uppercase tracking-tight">{title}</h5>
+                  <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest opacity-40 mt-0.5">{date}</p>
+              </div>
+          </div>
+          <div className="text-xs font-black text-primary px-3 py-1 bg-white rounded-lg clinical-shadow">{score}</div>
+      </div>
+  );
+}
+
+function ChevronRight({ className }: { className?: string }) {
     return (
-        <div className="flex items-center justify-between group cursor-pointer">
-            <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                    <PlayCircle className="w-5 h-5" />
-                </div>
-                <div>
-                    <h5 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{title}</h5>
-                    <p className="text-xs text-slate-400">{date}</p>
-                </div>
-            </div>
-            <div className="text-sm font-bold text-slate-900">{score}</div>
-        </div>
-    );
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+        </svg>
+    )
 }

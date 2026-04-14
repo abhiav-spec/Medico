@@ -8,7 +8,7 @@ export default function Starfield() {
     const points = useRef<THREE.Points>(null!);
     
     // Create random star positions
-    const particlesCount = 3000;
+    const particlesCount = 2000;
     const positions = useMemo(() => {
         const pos = new Float32Array(particlesCount * 3);
         for (let i = 0; i < particlesCount; i++) {
@@ -21,8 +21,8 @@ export default function Starfield() {
 
     // Animate stars
     useFrame((state, delta) => {
-        points.current.rotation.y += delta * 0.05;
-        points.current.rotation.x += delta * 0.02;
+        points.current.rotation.y += delta * 0.03;
+        points.current.rotation.x += delta * 0.01;
     });
 
     return (
@@ -36,10 +36,10 @@ export default function Starfield() {
                 />
             </bufferGeometry>
             <pointsMaterial
-                size={0.005}
-                color="#c0c1ff"
+                size={0.003}
+                color="#3525cd"
                 transparent
-                opacity={0.6}
+                opacity={0.1}
                 sizeAttenuation
             />
         </points>

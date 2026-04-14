@@ -1,23 +1,24 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuizStore } from '@/store/useQuizStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    Mic, 
-    MicOff, 
-    Volume2, 
     Clock, 
     ArrowRight, 
     CheckCircle2, 
     XCircle,
-    Brain,
     Activity,
-    Save
+    Brain,
+    Volume2,
+    Mic,
+    MicOff,
+    Check
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import api from '@/lib/api';
+import { gsap } from 'gsap';
 
 export default function ActiveQuizPage() {
     const { 
@@ -35,8 +36,22 @@ export default function ActiveQuizPage() {
     const [timeLeft, setTimeLeft] = useState(60);
     const [isListening, setIsListening] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const currentQuestion = questions[currentQuestionIndex];
+
+    // Entrance animation
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            gsap.from(".quiz-node", {
+                opacity: 0,
+                y: 20,
+                duration: 0.8,
+                ease: "power4.out"
+            });
+        }, containerRef);
+        return () => ctx.revert();
+    }, [currentQuestionIndex]);
 
     // Timer logic
     useEffect(() => {
@@ -58,7 +73,7 @@ export default function ActiveQuizPage() {
     const handleAnswer = (option: string) => {
         if (currentQuestion.userAnswer) return;
         answerQuestion(option);
-        speak(`Correct answer is ${currentQuestion.correctAnswer}. ${currentQuestion.explanation}`);
+        speak(`Observation logged. Correct path: ${currentQuestion.correctAnswer}. Rationale: ${currentQuestion.explanation}`);
     };
 
     const handleNext = () => {
@@ -80,9 +95,9 @@ export default function ActiveQuizPage() {
                 score 
             });
             router.push('/dashboard');
-            toast.success('Simulation complete and saved!');
+            toast.success('Simulation Logged Successfully');
         } catch (err) {
-            toast.error('Failed to save results');
+            toast.error('Data Uplink Error');
         } finally {
             setIsSubmitting(false);
         }
@@ -91,7 +106,7 @@ export default function ActiveQuizPage() {
     // Voice Input (Speech to Text)
     const toggleListening = () => {
         if (!('webkitSpeechRecognition' in window)) {
-            toast.error('Voice recognition not supported in this browser');
+            toast.error('Voice node not available');
             return;
         }
 
@@ -119,138 +134,149 @@ export default function ActiveQuizPage() {
 
             if (optionFound) {
                 handleAnswer(optionFound);
-                toast.success(`Selected: ${optionFound}`);
             } else {
-                toast.error("Could't match your voice to an option. Try saying 'Option 1' or the full text.");
+                toast.error("Telemetry could not parse response.");
             }
         };
 
         recognition.start();
     };
 
-    // Voice Output (Text to Speech)
     const speak = (text: string) => {
         if (!('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1;
+        utterance.rate = 1.1;
         utterance.pitch = 1;
         window.speechSynthesis.speak(utterance);
     };
 
-    if (!currentQuestion) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                <Brain className="w-12 h-12 text-blue-600 animate-pulse mb-4" />
-                <h2 className="text-xl font-bold">Initializing Simulation...</h2>
-            </div>
-        );
-    }
+    if (!currentQuestion) return null;
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-10">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                        <Activity className="w-6 h-6" />
+        <div ref={containerRef} className="max-w-6xl mx-auto py-10 px-6">
+            {/* Clinical Header */}
+            <div className="flex justify-between items-center mb-12 quiz-node">
+                <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-white clinical-shadow flex items-center justify-center text-primary border border-primary/5">
+                        <Activity className="w-8 h-8" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold heading-font capitalize">{organ} Module</h2>
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Question</span>
-                            <span className="text-sm font-bold text-blue-600">{currentQuestionIndex + 1} / {questions.length}</span>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] opacity-40">Diagnostic Protocol</span>
+                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{difficulty}</span>
                         </div>
+                        <h2 className="text-2xl font-black text-on-surface tracking-tighter uppercase leading-none">
+                            {organ} <span className="text-primary italic">Observation</span>
+                        </h2>
                     </div>
                 </div>
 
-                <div className={`flex items-center gap-3 px-5 py-2.5 rounded-2xl border-2 transition-colors ${
-                    timeLeft < 10 ? 'border-red-100 bg-red-50 text-red-600' : 'border-slate-100 bg-white text-slate-600'
-                }`}>
-                    <Clock className={`w-5 h-5 ${timeLeft < 10 ? 'animate-pulse' : ''}`} />
-                    <span className="text-lg font-bold tabular-nums">{timeLeft}s</span>
+                <div className="flex items-center gap-6">
+                    <div className="hidden md:block text-right">
+                        <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">Load Status</p>
+                        <p className="text-xl font-black text-on-surface leading-none mt-1">
+                            {currentQuestionIndex + 1} <span className="opacity-30">/ {questions.length}</span>
+                        </p>
+                    </div>
+                    <div className={`flex items-center gap-3 px-6 py-3 rounded-2xl clinical-shadow border transition-colors ${timeLeft < 10 ? 'bg-[#ba1a1a]/5 border-[#ba1a1a]/20' : 'bg-white border-primary/5'}`}>
+                        <div className={`w-2 h-2 rounded-full animate-pulse ${timeLeft < 10 ? 'bg-error' : 'bg-primary'}`} />
+                        <span className={`text-2xl font-black tabular-nums leading-none ${timeLeft < 10 ? 'text-error' : 'text-on-surface'}`}>
+                            {timeLeft}s
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            {/* Question Card */}
+            {/* Neural Console */}
             <AnimatePresence mode="wait">
                 <motion.div
                     key={currentQuestionIndex}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="bg-white rounded-3xl border border-slate-200 p-8 md:p-12 premium-shadow"
+                    className="bg-white rounded-[3rem] clinical-shadow border border-primary/5 p-12 md:p-20 relative overflow-hidden quiz-node"
                 >
-                    <h3 className="text-2xl font-bold heading-font text-slate-900 mb-10 leading-snug">
+                    <div className="absolute top-0 left-0 w-3 h-full bg-primary" />
+                    
+                    <div className="flex items-center gap-3 mb-10">
+                        <div className="px-3 py-1 bg-[#3525cd]/5 rounded-lg text-[10px] font-black text-primary uppercase tracking-widest">
+                            Clinical Data Link
+                        </div>
+                    </div>
+
+                    <h3 className="text-4xl font-black text-on-surface mb-16 leading-tight tracking-tight">
                         {currentQuestion.question}
                     </h3>
 
-                    <div className="grid gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {currentQuestion.options.map((option, idx) => {
                             const isSelected = currentQuestion.userAnswer === option;
                             const isCorrect = option === currentQuestion.correctAnswer;
                             const showResult = !!currentQuestion.userAnswer;
-
-                            let styles = "border-slate-100 bg-slate-50 hover:border-slate-300 hover:bg-slate-100 text-slate-700";
-                            
-                            if (showResult) {
-                                if (isCorrect) styles = "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md";
-                                else if (isSelected) styles = "border-red-500 bg-red-50 text-red-700 shadow-md";
-                                else styles = "border-slate-100 bg-slate-50 opacity-50";
-                            }
 
                             return (
                                 <button
                                     key={idx}
                                     disabled={showResult}
                                     onClick={() => handleAnswer(option)}
-                                    className={`w-full flex items-center justify-between p-5 rounded-2xl border-2 font-bold text-left transition-all duration-300 ${styles}`}
+                                    className={`relative group p-8 rounded-3xl transition-all duration-500 text-left border ${
+                                        showResult 
+                                            ? isCorrect 
+                                                ? 'bg-[#3525cd] text-white clinical-shadow border-transparent' 
+                                                : isSelected 
+                                                    ? 'bg-[#ba1a1a] text-white clinical-shadow border-transparent' 
+                                                    : 'bg-[#eff4ff] border-transparent opacity-40'
+                                            : isSelected
+                                                ? 'bg-[#3525cd] text-white clinical-shadow border-transparent'
+                                                : 'bg-[#f8f9ff] border-transparent hover:bg-[#3525cd]/5 text-on-surface-variant hover:text-primary'
+                                    }`}
                                 >
-                                    <span className="flex items-center gap-4">
-                                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs border ${
-                                            isSelected ? 'bg-white border-transparent' : 'bg-white border-slate-200'
+                                    <div className="flex items-center gap-6">
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm border-2 ${
+                                            isSelected || (showResult && isCorrect) ? 'bg-white/20 border-white/40 text-white' : 'bg-white border-primary/10 text-primary'
                                         }`}>
                                             {String.fromCharCode(65 + idx)}
-                                        </span>
-                                        {option}
-                                    </span>
-                                    {showResult && isCorrect && <CheckCircle2 className="w-6 h-6 text-emerald-600" />}
-                                    {showResult && isSelected && !isCorrect && <XCircle className="w-6 h-6 text-red-600" />}
+                                        </div>
+                                        <span className="text-lg font-black tracking-tight">{option}</span>
+                                    </div>
+                                    
+                                    {showResult && isCorrect && (
+                                        <div className="absolute right-8 top-1/2 -translate-y-1/2 bg-white/20 p-2 rounded-full">
+                                            <Check className="w-6 h-6 text-white" />
+                                        </div>
+                                    )}
                                 </button>
                             );
                         })}
                     </div>
 
-                    {/* Explanation Section */}
+                    {/* Simulation Analysis Overlay */}
                     <AnimatePresence>
                         {currentQuestion.userAnswer && (
                             <motion.div 
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="mt-10 p-6 bg-blue-50/50 rounded-2xl border border-blue-100"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mt-20 pt-16 border-t-2 border-[#eff4ff]"
                             >
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-2 text-blue-700 font-bold">
-                                        <Volume2 className="w-5 h-5" />
-                                        AI Explanation
+                                <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+                                    <div className="flex-1 space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <Volume2 className="w-5 h-5 text-primary" />
+                                            <h4 className="text-xs font-black text-on-surface uppercase tracking-[0.2em] opacity-40">Clinical Rationale</h4>
+                                        </div>
+                                        <div className="p-8 rounded-[2rem] bg-[#eff4ff] border-2 border-primary/5">
+                                            <p className="text-on-surface text-xl font-bold leading-relaxed italic opacity-80">
+                                                "{currentQuestion.explanation}"
+                                            </p>
+                                        </div>
                                     </div>
-                                    <button 
-                                        onClick={() => speak(currentQuestion.explanation)}
-                                        className="text-xs font-bold text-blue-600 bg-white px-3 py-1.5 rounded-lg border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                                    >
-                                        Replay Audio
-                                    </button>
-                                </div>
-                                <p className="text-slate-600 leading-relaxed italic text-sm">
-                                    {currentQuestion.explanation}
-                                </p>
-                                <div className="mt-8 flex justify-end">
+                                    
                                     <button
                                         onClick={handleNext}
-                                        disabled={isSubmitting}
-                                        className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg"
+                                        className="neural-pulse w-full md:w-auto px-16 py-6 rounded-2xl font-black text-white flex items-center justify-center gap-4 transition-all shadow-2xl hover:scale-105"
                                     >
-                                        {isSubmitting ? 'Saving...' : currentQuestionIndex === questions.length - 1 ? 'Finish Simulation' : 'Next Question'}
+                                        <span className="text-xs uppercase tracking-[0.2em]">{currentQuestionIndex === questions.length - 1 ? 'Finalize Logic' : 'Next Transmission'}</span>
                                         <ArrowRight className="w-5 h-5" />
                                     </button>
                                 </div>
@@ -260,22 +286,35 @@ export default function ActiveQuizPage() {
                 </motion.div>
             </AnimatePresence>
 
-            {/* Bottom Controls */}
-            <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-4 bg-white/80 backdrop-blur-xl border border-white/20 rounded-full shadow-2xl premium-shadow z-20">
-                <button
-                    onClick={toggleListening}
-                    className={`flex items-center gap-3 px-6 py-3 rounded-full font-bold transition-all ${
-                        isListening 
-                            ? 'bg-red-500 text-white animate-pulse' 
-                            : 'bg-slate-900 text-white hover:bg-slate-800'
-                    }`}
-                >
-                    {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                    {isListening ? 'Listening...' : 'Answer via Voice'}
-                </button>
-                <div className="w-px h-8 bg-slate-200" />
-                <div className="text-sm font-bold text-slate-500 flex items-center gap-2">
-                    <Save className="w-4 h-4" /> Auto-saving progress
+            {/* Voice Command Module */}
+            <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50">
+                <div className="bg-white p-3 rounded-full border border-primary/5 clinical-shadow flex items-center gap-4">
+                    <button
+                        onClick={toggleListening}
+                        className={`group flex items-center gap-5 pl-8 pr-10 py-5 rounded-full font-black transition-all ${
+                            isListening 
+                                ? 'bg-error text-white shadow-[0_20px_40px_rgba(186,26,26,0.3)]' 
+                                : 'bg-[#3525cd] text-white hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(53,37,205,0.3)]'
+                        }`}
+                    >
+                        {isListening ? (
+                            <div className="flex gap-1.5 items-center">
+                                <span className="w-1.5 h-4 bg-white animate-pulse" />
+                                <span className="w-1.5 h-7 bg-white animate-pulse" style={{ animationDelay: '100ms'}} />
+                                <span className="w-1.5 h-3 bg-white animate-pulse" style={{ animationDelay: '200ms'}} />
+                                <MicOff className="w-5 h-5 ml-2" />
+                            </div>
+                        ) : (
+                            <Mic className="w-6 h-6 group-hover:animate-bounce" />
+                        )}
+                        <span className="text-xs uppercase tracking-[0.2em]">{isListening ? 'LISTENING...' : 'VOICE LINK'}</span>
+                    </button>
+                    {!isListening && (
+                         <div className="pr-8 flex flex-col items-center">
+                            <Brain className="w-5 h-5 text-primary opacity-20" />
+                            <span className="text-[8px] font-black uppercase tracking-tighter opacity-20">Link v2.4</span>
+                         </div>
+                    )}
                 </div>
             </div>
         </div>
