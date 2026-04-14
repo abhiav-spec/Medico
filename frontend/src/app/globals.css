@@ -3,43 +3,70 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 15, 23, 42;
-  --background-start-rgb: 248, 250, 252;
-  --background-end-rgb: 255, 255, 255;
+  --background: #0c0c1d;
+  --foreground: #e3e0f9;
+  --primary: #c0c1ff;
+  --secondary: #5de6ff;
+  --accent: #6366F1;
+  --surface-low: #121223;
+  --surface-high: #1e1e30;
+  --surface-highest: #333346;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: white;
-  min-height: 100vh;
-}
-
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.premium-shadow {
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 5px 15px -5px rgba(0, 0, 0, 0.03);
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
 }
 
 .heading-font {
   font-family: var(--font-outfit), sans-serif;
+  letter-spacing: -0.02em;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Glassmorphism */
+.glass {
+  background: rgba(30, 30, 48, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
+
+.glass-bright {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
+
+/* Animated Gradients */
+.neural-pulse {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  box-shadow: 0 0 20px rgba(93, 230, 255, 0.3);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+
+.text-gradient {
+  background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Tonal Layering */
+.surface-tier-1 { background-color: var(--surface-low); }
+.surface-tier-2 { background-color: var(--surface-high); }
+.surface-tier-3 { background-color: var(--surface-highest); }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

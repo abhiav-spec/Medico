@@ -2,7 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
-import { ArrowRight, Brain, Heart, Lungs, GraduationCap, ChevronRight } from "lucide-react";
+import { ArrowRight, Brain, Heart, Wind, GraduationCap, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -77,7 +77,7 @@ export default function Home() {
               color="purple"
             />
             <FeatureCard 
-              icon={<Lungs className="w-6 h-6 text-blue-500" />}
+              icon={<Wind className="w-6 h-6 text-blue-500" />}
               title="Pulmonology"
               description="Study the respiratory system, complex lung diseases, and ventilation mechanics."
               color="blue"

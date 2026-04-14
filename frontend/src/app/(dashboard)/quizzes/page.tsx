@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Brain, Heart, Lungs, ChevronRight, Loader2, Sparkles } from 'lucide-react';
+import { Brain, Heart, Wind, ChevronRight, Loader2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '@/lib/api';
 import { useQuizStore } from '@/store/useQuizStore';
@@ -11,7 +11,7 @@ import { toast } from 'react-hot-toast';
 const organs = [
     { id: 'heart', name: 'Cardiology', icon: Heart, color: 'text-pink-600', bg: 'bg-pink-50' },
     { id: 'brain', name: 'Neurology', icon: Brain, color: 'text-purple-600', bg: 'bg-purple-50' },
-    { id: 'lungs', name: 'Pulmonology', icon: Lungs, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { id: 'lungs', name: 'Pulmonology', icon: Wind, color: 'text-blue-600', bg: 'bg-blue-50' },
 ];
 
 const difficulties = ['easy', 'medium', 'hard'];
