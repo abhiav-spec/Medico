@@ -1,7 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simulate login success
+    navigate('/dashboard');
+  };
+
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col selection:bg-primary-container selection:text-white font-inter">
       <main className="flex-grow flex items-center justify-center p-6 relative overflow-hidden">
@@ -60,7 +68,7 @@ const Login: React.FC = () => {
                 <h2 className="text-3xl font-bold text-on-surface tracking-tight mb-2">Welcome back</h2>
                 <p className="text-on-surface-variant">Please enter your professional credentials to continue.</p>
               </div>
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-on-surface-variant tracking-wide px-1" htmlFor="email">Email Address</label>
                   <div className="relative">

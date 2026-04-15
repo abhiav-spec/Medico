@@ -1,7 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simulate signup success
+    navigate('/dashboard');
+  };
+
   return (
     <div className="bg-background font-inter text-on-background min-h-screen flex flex-col">
       {/* Abstract Decorative Background Layers */}
@@ -25,7 +33,7 @@ const Signup: React.FC = () => {
               <h2 className="text-2xl font-bold text-on-surface mb-2">Create Account</h2>
               <p className="text-on-surface-variant text-sm">Join the next generation of medical diagnostic training.</p>
             </div>
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               {/* Name Field */}
               <div>
                 <label className="block text-xs font-bold tracking-wider text-on-surface-variant uppercase mb-2 ml-1" htmlFor="full_name">Full Name</label>
